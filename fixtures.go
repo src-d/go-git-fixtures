@@ -8,12 +8,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"gopkg.in/check.v1"
-	"gopkg.in/src-d/go-git.v4/plumbing"
-
 	"github.com/alcortesm/tgz"
+	"gopkg.in/check.v1"
 	"srcd.works/go-billy.v1"
 	"srcd.works/go-billy.v1/osfs"
+	"srcd.works/go-git.v4/plumbing"
 )
 
 var RootFolder = ""
