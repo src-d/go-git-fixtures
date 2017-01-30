@@ -13,7 +13,7 @@ import (
 
 	"github.com/alcortesm/tgz"
 	"srcd.works/go-billy.v1"
-	osfs "srcd.works/go-billy.v1/os"
+	"srcd.works/go-billy.v1/osfs"
 )
 
 var RootFolder = ""
@@ -275,7 +275,7 @@ func Init() error {
 
 	for _, src := range srcs {
 		rf := filepath.Join(
-			src, "gopkg.in/src-d/go-git.v4", "fixtures",
+			src, "github.com/src-d/go-git-fixtures",
 		)
 
 		if _, err := os.Stat(rf); err == nil {
