@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -68,7 +67,11 @@ var fixtures = Fixtures{{
 }, {
 	Tags:         []string{"worktree"},
 	URL:          "https://github.com/git-fixtures/basic.git",
-	WorktreeHash: plumbing.NewHash("e4413db6700d0e72e7680b17c3d5ebbc2d1861bc"),
+	WorktreeHash: plumbing.NewHash("d2e42ddd68eacbb6034e7724e0dd4117ff1f01ee"),
+}, {
+	Tags:         []string{"worktree", "submodule"},
+	URL:          "https://github.com/git-fixtures/submodule.git",
+	WorktreeHash: plumbing.NewHash("0fc876cceca4c9b7c26002d1408e595d132cec0a"),
 }, {
 	Tags:         []string{"packfile", ".git", "unpacked", "multi-packfile"},
 	URL:          "https://github.com/src-d/go-git.git",
@@ -194,6 +197,10 @@ func (f *Fixture) Idx() *os.File {
 // DotGit creates a new temporary directory and unpacks the repository .git
 // directory into it. Multiple calls to DotGit returns different directories.
 func (f *Fixture) DotGit() billy.Filesystem {
+	if f.DotGitHash == plumbing.ZeroHash && f.WorktreeHash != plumbing.ZeroHash {
+		return f.Worktree().Dir(".git")
+	}
+
 	fn := filepath.Join(RootFolder, DataFolder, fmt.Sprintf("git-%s.tgz", f.DotGitHash))
 	path, err := tgz.Extract(fn)
 	if err != nil {
@@ -205,22 +212,14 @@ func (f *Fixture) DotGit() billy.Filesystem {
 }
 
 func (f *Fixture) Worktree() billy.Filesystem {
-	fn := filepath.Join(RootFolder, DataFolder, fmt.Sprintf("git-%s.tgz", f.DotGitHash))
-	git, err := tgz.Extract(fn)
+	fn := filepath.Join(RootFolder, DataFolder, fmt.Sprintf("worktree-%s.tgz", f.WorktreeHash))
+	path, err := tgz.Extract(fn)
 	if err != nil {
 		panic(err)
 	}
 
-	worktree, err := ioutil.TempDir("", "worktree")
-	if err != nil {
-		panic(err)
-	}
-
-	if err := os.Rename(git, filepath.Join(worktree, ".git")); err != nil {
-		panic(err)
-	}
-
-	return osfs.New(worktree)
+	folders[path] = true
+	return osfs.New(path)
 }
 
 type Fixtures []*Fixture
