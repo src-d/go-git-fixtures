@@ -71,7 +71,7 @@ var fixtures = Fixtures{{
 }, {
 	Tags:         []string{"worktree", "submodule"},
 	URL:          "https://github.com/git-fixtures/submodule.git",
-	WorktreeHash: plumbing.NewHash("0fc876cceca4c9b7c26002d1408e595d132cec0a"),
+	WorktreeHash: plumbing.NewHash("8b4d55c85677b6b94bef2e46832ed2174ed6ecaf"),
 }, {
 	Tags:         []string{"packfile", ".git", "unpacked", "multi-packfile"},
 	URL:          "https://github.com/src-d/go-git.git",
