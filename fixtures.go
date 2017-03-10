@@ -9,8 +9,8 @@ import (
 
 	"github.com/alcortesm/tgz"
 	"gopkg.in/check.v1"
-	"gopkg.in/src-d/go-billy.v1"
-	"gopkg.in/src-d/go-billy.v1/osfs"
+	"gopkg.in/src-d/go-billy.v2"
+	"gopkg.in/src-d/go-billy.v2/osfs"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
