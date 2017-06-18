@@ -9,8 +9,8 @@ import (
 
 	"github.com/alcortesm/tgz"
 	"gopkg.in/check.v1"
-	"gopkg.in/src-d/go-billy.v2"
-	"gopkg.in/src-d/go-billy.v2/osfs"
+	"gopkg.in/src-d/go-billy.v3"
+	"gopkg.in/src-d/go-billy.v3/osfs"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
@@ -198,7 +198,8 @@ func (f *Fixture) Idx() *os.File {
 // directory into it. Multiple calls to DotGit returns different directories.
 func (f *Fixture) DotGit() billy.Filesystem {
 	if f.DotGitHash == plumbing.ZeroHash && f.WorktreeHash != plumbing.ZeroHash {
-		return f.Worktree().Dir(".git")
+		fs, _ := f.Worktree().Chroot(".git")
+		return fs.(billy.Filesystem)
 	}
 
 	fn := filepath.Join(RootFolder, DataFolder, fmt.Sprintf("git-%s.tgz", f.DotGitHash))
