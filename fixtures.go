@@ -270,7 +270,11 @@ func (g Fixtures) Exclude(tag string) Fixtures {
 
 // Init sets the correct path to access the fixtures files
 func Init() error {
-	srcs := build.Default.SrcDirs()
+	// First look at possible vendor directories
+	srcs := vendorDirectories()
+
+	// And then GOPATH
+	srcs = append(srcs, build.Default.SrcDirs()...)
 
 	for _, src := range srcs {
 		rf := filepath.Join(
@@ -284,6 +288,26 @@ func Init() error {
 	}
 
 	return errors.New("fixtures folder not found")
+}
+
+func vendorDirectories() []string {
+	dir, err := os.Getwd()
+	if err != nil {
+		return nil
+	}
+
+	var dirs []string
+
+	for {
+		if dir == "." || dir == "/" {
+			break
+		}
+
+		dirs = append(dirs, filepath.Join(dir, "vendor"))
+		dir = filepath.Dir(dir)
+	}
+
+	return dirs
 }
 
 // Clean cleans all the temporal files created
