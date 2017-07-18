@@ -299,11 +299,11 @@ func vendorDirectories() []string {
 	var dirs []string
 
 	for {
-		if dir == "." || dir == "/" {
+		dirs = append(dirs, filepath.Join(dir, "vendor"))
+		if dir == filepath.Dir(dir) {
 			break
 		}
 
-		dirs = append(dirs, filepath.Join(dir, "vendor"))
 		dir = filepath.Dir(dir)
 	}
 
