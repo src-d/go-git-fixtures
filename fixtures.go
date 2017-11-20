@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/alcortesm/tgz"
 	"gopkg.in/check.v1"
@@ -210,6 +212,32 @@ func (f *Fixture) DotGit() billy.Filesystem {
 
 	folders[path] = true
 	return osfs.New(path)
+}
+
+// EnsureIsBare overrides the config file with one where bare is true.
+func EnsureIsBare(fs billy.Filesystem) error {
+	if _, err := fs.Stat("config"); err != nil {
+		fmt.Printf("not .git folder: %s\n", err)
+	}
+
+	cfg, err := fs.OpenFile("config", os.O_TRUNC|os.O_WRONLY, 0)
+	if err != nil {
+		return err
+	}
+
+	defer cfg.Close()
+
+	content := strings.NewReader("" +
+		"[core]\n" +
+		"repositoryformatversion = 0\n" +
+		"filemode = true\n" +
+		"bare = true\n" +
+		"[http]\n" +
+		"receivepack = true\n",
+	)
+
+	_, err = io.Copy(cfg, content)
+	return err
 }
 
 func (f *Fixture) Worktree() billy.Filesystem {
