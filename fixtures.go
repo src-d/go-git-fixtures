@@ -11,8 +11,8 @@ import (
 
 	"github.com/alcortesm/tgz"
 	"gopkg.in/check.v1"
-	"gopkg.in/src-d/go-billy.v3"
-	"gopkg.in/src-d/go-billy.v3/osfs"
+	"gopkg.in/src-d/go-billy.v4"
+	"gopkg.in/src-d/go-billy.v4/osfs"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
@@ -306,7 +306,7 @@ func Init() error {
 
 	for _, src := range srcs {
 		rf := filepath.Join(
-			src, "github.com/src-d/go-git-fixtures",
+			src, "gopkg.in/src-d/go-git-fixtures.v3",
 		)
 
 		if _, err := os.Stat(rf); err == nil {
