@@ -137,6 +137,9 @@ var fixtures = Fixtures{{
 	URL:          "https://github.com/git-fixtures/empty.git",
 	DotGitHash:   plumbing.NewHash("bf3fedcc8e20fd0dec9172987ceea0038d17b516"),
 	ObjectsCount: 0,
+}, {
+	Tags:         []string{"worktree", "alternates"},
+	WorktreeHash: plumbing.NewHash("a6b6ff89c593f042347113203ead1c14ab5733ce"),
 }}
 
 func All() Fixtures {
