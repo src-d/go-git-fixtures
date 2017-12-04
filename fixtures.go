@@ -140,6 +140,9 @@ var fixtures = Fixtures{{
 }, {
 	Tags:         []string{"worktree", "alternates"},
 	WorktreeHash: plumbing.NewHash("a6b6ff89c593f042347113203ead1c14ab5733ce"),
+}, {
+	Tags:         []string{"worktree", "dirty"},
+	WorktreeHash: plumbing.NewHash("7203669c66103305e56b9dcdf940a7fbeb515f28"),
 }}
 
 func All() Fixtures {
