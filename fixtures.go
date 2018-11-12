@@ -143,6 +143,13 @@ var fixtures = Fixtures{{
 }, {
 	Tags:         []string{"worktree", "dirty"},
 	WorktreeHash: plumbing.NewHash("7203669c66103305e56b9dcdf940a7fbeb515f28"),
+}, {
+	Tags:         []string{"packfile", "standalone"}, // standalone packfile that does not have any dependencies nor is part of any other fixture repo
+	PackfileHash: plumbing.NewHash("3638209d310e10ea8d90c362d568be65dd5e03a6"),
+}, {
+	Tags:         []string{"thinpack"}, // adds commit on top of spinnaker fixture 06ce06d0fc49646c4de733c45b7788aabad98a6f via a thin pack
+	PackfileHash: plumbing.NewHash("ee4fef0ef8be5053ebae4ce75acf062ddf3031fb"),
+	Head:         plumbing.NewHash("ee372bb08322c1e6e7c6c4f953cc6bf72784e7fb"), // the thin pack adds this commit
 }}
 
 func All() Fixtures {
