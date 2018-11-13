@@ -328,6 +328,14 @@ func Init() error {
 		}
 	}
 
+	// Try the modules local cache
+	if dir, err := os.Getwd(); err == nil {
+		if pkg, err := build.Default.Import("gopkg.in/src-d/go-git-fixtures.v3", dir, build.FindOnly); err == nil {
+			RootFolder = pkg.Dir
+			return nil
+		}
+	}
+
 	return errors.New("fixtures folder not found")
 }
 
