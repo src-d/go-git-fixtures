@@ -67,6 +67,10 @@ var fixtures = Fixtures{{
 	URL:        "https://github.com/git-fixtures/basic.git",
 	DotGitHash: plumbing.NewHash("935e5ac17c41c309c356639816ea0694a568c484"),
 }, {
+	Tags:       []string{".git", "end-of-index-entry"},
+	URL:        "https://github.com/git-fixtures/basic.git",
+	DotGitHash: plumbing.NewHash("ab06771a67110b976953d34400d4dbc465ccd2d9"),
+}, {
 	Tags:         []string{"worktree"},
 	URL:          "https://github.com/git-fixtures/basic.git",
 	WorktreeHash: plumbing.NewHash("d2e42ddd68eacbb6034e7724e0dd4117ff1f01ee"),
