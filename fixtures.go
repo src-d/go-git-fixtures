@@ -163,6 +163,9 @@ var fixtures = Fixtures{{
 	PackfileHash: plumbing.NewHash("769137af7784db501bca677fbd56fef8b52515b7"),
 	DotGitHash:   plumbing.NewHash("cf717ccadce761d60bb4a8557a7b9a2efd23816a"),
 	ObjectsCount: 31,
+}, {
+	Tags:         []string{"worktree", "linked-worktree"},
+	WorktreeHash: plumbing.NewHash("6e2f6a44e71cdf5f0895d37ea433937e58c051c0"),
 }}
 
 func All() Fixtures {
