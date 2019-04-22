@@ -157,6 +157,12 @@ var fixtures = Fixtures{{
 }, {
 	Tags:       []string{"merge-base"},
 	DotGitHash: plumbing.NewHash("26baa505b9f6fb2024b9999c140b75514718c988"),
+}, {
+	Tags:         []string{"commit-graph"},
+	Head:         plumbing.NewHash("b9d69064b190e7aedccf84731ca1d917871f8a1c"),
+	PackfileHash: plumbing.NewHash("769137af7784db501bca677fbd56fef8b52515b7"),
+	DotGitHash:   plumbing.NewHash("cf717ccadce761d60bb4a8557a7b9a2efd23816a"),
+	ObjectsCount: 31,
 }}
 
 func All() Fixtures {
