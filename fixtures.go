@@ -1,12 +1,10 @@
 package fixtures
 
 import (
-	"errors"
 	"fmt"
-	"go/build"
 	"io"
+	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/alcortesm/tgz"
@@ -16,11 +14,9 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
-var RootFolder = ""
+//go:generate esc -o data.go -pkg=fixtures data
 
-const DataFolder = "data"
-
-var folders = make(map[string]bool, 0)
+var files = make(map[string]string)
 
 var fixtures = Fixtures{{
 	Tags:         []string{"packfile", "ofs-delta", ".git", "root-reference"},
@@ -202,23 +198,51 @@ func (f *Fixture) Is(tag string) bool {
 	return false
 }
 
+func (f *Fixture) file(path string) (*os.File, error) {
+	if fpath, ok := files[path]; ok {
+		return os.Open(fpath)
+	}
+
+	bytes, err := FSByte(false, path)
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := ioutil.TempFile(os.TempDir(), "go-git-fixtures")
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := file.Write(bytes); err != nil {
+		return nil, err
+	}
+
+	if err := file.Sync(); err != nil {
+		return nil, err
+	}
+
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		return nil, err
+	}
+
+	files[path] = file.Name()
+
+	return file, nil
+}
+
 func (f *Fixture) Packfile() *os.File {
-	fn := filepath.Join(RootFolder, DataFolder, fmt.Sprintf("pack-%s.pack", f.PackfileHash))
-	file, err := os.Open(fn)
+	file, err := f.file(fmt.Sprintf("pack-%s.pack", f.PackfileHash))
 	if err != nil {
 		panic(err)
 	}
-
 	return file
 }
 
 func (f *Fixture) Idx() *os.File {
-	fn := filepath.Join(RootFolder, DataFolder, fmt.Sprintf("pack-%s.idx", f.PackfileHash))
-	file, err := os.Open(fn)
+	file, err := f.file(fmt.Sprintf("pack-%s.idx", f.PackfileHash))
 	if err != nil {
 		panic(err)
 	}
-
 	return file
 }
 
@@ -230,13 +254,16 @@ func (f *Fixture) DotGit() billy.Filesystem {
 		return fs.(billy.Filesystem)
 	}
 
-	fn := filepath.Join(RootFolder, DataFolder, fmt.Sprintf("git-%s.tgz", f.DotGitHash))
-	path, err := tgz.Extract(fn)
+	file, err := f.file(fmt.Sprintf("git-%s.tgz", f.DotGitHash))
 	if err != nil {
 		panic(err)
 	}
 
-	folders[path] = true
+	path, err := tgz.Extract(file.Name())
+	if err != nil {
+		panic(err)
+	}
+
 	return osfs.New(path)
 }
 
@@ -267,13 +294,16 @@ func EnsureIsBare(fs billy.Filesystem) error {
 }
 
 func (f *Fixture) Worktree() billy.Filesystem {
-	fn := filepath.Join(RootFolder, DataFolder, fmt.Sprintf("worktree-%s.tgz", f.WorktreeHash))
-	path, err := tgz.Extract(fn)
+	file, err := f.file(fmt.Sprintf("worktree-%s.tgz", f.WorktreeHash))
 	if err != nil {
 		panic(err)
 	}
 
-	folders[path] = true
+	path, err := tgz.Extract(file.Name())
+	if err != nil {
+		panic(err)
+	}
+
 	return osfs.New(path)
 }
 
@@ -322,77 +352,18 @@ func (g Fixtures) Exclude(tag string) Fixtures {
 	return r
 }
 
-// Init sets the correct path to access the fixtures files
-func Init() error {
-	// First look at possible vendor directories
-	srcs := vendorDirectories()
-
-	// And then GOPATH
-	srcs = append(srcs, build.Default.SrcDirs()...)
-
-	for _, src := range srcs {
-		rf := filepath.Join(
-			src, "gopkg.in/src-d/go-git-fixtures.v3",
-		)
-		if _, err := os.Stat(filepath.Join(rf, DataFolder)); err == nil {
-			RootFolder = rf
-			return nil
-		}
-	}
-
-	// Try the modules local cache
-	if dir, err := os.Getwd(); err == nil {
-		if pkg, err := build.Default.Import("gopkg.in/src-d/go-git-fixtures.v3", dir, build.FindOnly); err == nil {
-			if _, err := os.Stat(filepath.Join(pkg.Dir, DataFolder)); err == nil {
-				RootFolder = pkg.Dir
-				return nil
-			}
-
-		}
-	}
-
-	return errors.New("fixtures folder not found")
-}
-
-func vendorDirectories() []string {
-	dir, err := os.Getwd()
-	if err != nil {
-		return nil
-	}
-
-	var dirs []string
-
-	for {
-		dirs = append(dirs, filepath.Join(dir, "vendor"))
-		if dir == filepath.Dir(dir) {
-			break
-		}
-
-		dir = filepath.Dir(dir)
-	}
-
-	return dirs
-}
-
 // Clean cleans all the temporal files created
 func Clean() error {
-	for f := range folders {
-		err := os.RemoveAll(f)
-		if err != nil {
+	for _, fname := range files {
+		if err := os.Remove(fname); err != nil {
 			return err
 		}
-
-		delete(folders, f)
+		delete(files, fname)
 	}
-
 	return nil
 }
 
 type Suite struct{}
-
-func (s *Suite) SetUpSuite(c *check.C) {
-	c.Assert(Init(), check.IsNil)
-}
 
 func (s *Suite) TearDownSuite(c *check.C) {
 	c.Assert(Clean(), check.IsNil)
