@@ -203,7 +203,7 @@ func (f *Fixture) file(path string) (*os.File, error) {
 		return os.Open(fpath)
 	}
 
-	bytes, err := FSByte(false, path)
+	bytes, err := FSByte(false, "/data/"+path)
 	if err != nil {
 		return nil, err
 	}
@@ -354,8 +354,8 @@ func (g Fixtures) Exclude(tag string) Fixtures {
 
 // Clean cleans all the temporal files created
 func Clean() error {
-	for _, fname := range files {
-		if err := os.Remove(fname); err != nil {
+	for fname, f := range files {
+		if err := os.Remove(f); err != nil {
 			return err
 		}
 		delete(files, fname)
