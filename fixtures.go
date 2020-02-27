@@ -165,7 +165,7 @@ var fixtures = Fixtures{{
 	ObjectsCount: 31,
 }, {
 	Tags:         []string{"worktree", "linked-worktree"},
-	WorktreeHash: plumbing.NewHash("6e2f6a44e71cdf5f0895d37ea433937e58c051c0"),
+	WorktreeHash: plumbing.NewHash("363d996b02d9c3b598f0176619f5c6a44a82480a"),
 }}
 
 func All() Fixtures {
